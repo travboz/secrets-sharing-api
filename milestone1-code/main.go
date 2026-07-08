@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -31,15 +32,27 @@ func main() {
 
 	fmt.Println("File path value:", DATA_FILE_PATH)
 
-	fStore, err := NewFileStore(DATA_FILE_PATH)
+	_, err := NewFileStore(DATA_FILE_PATH)
 	if err != nil {
 		slog.Error("Error creating file store", "error", err)
 		os.Exit(1)
 	}
 
-	err = fStore.Write(myDataType{Key: "name", Value: "10000"})
-	if err != nil {
-		slog.Error("Error writing to file store", "error", err)
+	mux := http.NewServeMux()
+	setupRoutes(mux)
+
+	port := 8080
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: mux,
+	}
+
+	slog.Info("Server listening on", "port", srv.Addr)
+
+	if err := srv.ListenAndServe(); err != nil {
+		slog.Error("Error starting server", "error", err)
 		os.Exit(1)
 	}
+
 }
