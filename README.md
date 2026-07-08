@@ -1,10 +1,10 @@
-# Project Name
+# Secrets Sharing Web API
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]
-[![Coverage](https://img.shields.io/badge/coverage-70%25-salmon)]
-[![License](https://img.shields.io/badge/license-MIT-yellow)]
-[![go version](https://img.shields.io/badge/go-v1.26.4-blue)]
-[![Downloads](https://img.shields.io/badge/downloads-0k%2Fmonth-purple)]
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-70%25-salmon)
+![License](https://img.shields.io/badge/license-MIT-yellow)
+![go version](https://img.shields.io/badge/go-v1.26.4-blue)
+![Downloads](https://img.shields.io/badge/downloads-0k%2Fmonth-purple)
 
 **One-line description:** Create and share secrets easily using this API.
 
