@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -40,7 +41,7 @@ Example of the ReadFunc mock function:
 	}
 */
 
-func TestEndpointMethods(t *testing.T) {
+func TestEndpointRouting(t *testing.T) {
 	t.Run("GET request to secret endpoint succeeds", func(t *testing.T) {
 		readFn := func(key string) (string, error) { return "super-secret", nil }
 		writeFn := func(data store.SecretData) error { return nil }
@@ -116,7 +117,7 @@ func TestEndpointMethods(t *testing.T) {
 	})
 }
 
-func TestHealthcheck(t *testing.T) {
+func TestHealthCheck(t *testing.T) {
 	t.Run("Request to healthcheck calls healthcheck", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPut, "/healthcheck", nil)
 		rr := httptest.NewRecorder()
@@ -133,15 +134,67 @@ func TestHealthcheck(t *testing.T) {
 		}
 	})
 
-	t.Run("Healthcheck returns 'ok' as response body", func(t *testing.T) {
+	t.Run("Healthcheck returns ok as response body", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPut, "/healthcheck", nil)
 		rr := httptest.NewRecorder()
 
 		healthCheckHandler(rr, req)
 
 		resp := rr.Result()
+		body, _ := io.ReadAll(resp.Body)
 
-		want := http.StatusOK
+		want := "ok"
+		got := string(body)
+
+		if got != want {
+			t.Errorf("got %q, but want %q", got, want)
+		}
+	})
+}
+
+func TestEndpointErrors(t *testing.T) {
+	t.Run("GET request with empty id to secret endpoint fails", func(t *testing.T) {
+		// readFn := func(key string) (string, error) { return "", nil }
+		// writeFn := func(data store.SecretData) error { return nil }
+		mockStore := &MockFileStore{
+			ReadFunc:  nil,
+			WriteFunc: nil,
+		}
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rr := httptest.NewRecorder()
+
+		secretHandler(mockStore)(rr, req)
+
+		resp := rr.Result()
+
+		want := http.StatusBadRequest
+		got := resp.StatusCode
+
+		if got != want {
+			t.Errorf("got '%d', but want '%d'", got, want)
+		}
+	})
+
+	t.Run("POST request with empty body to secret endpoint fails", func(t *testing.T) {
+		// readFn := func(key string) (string, error) { return "", nil }
+		// writeFn := func(data store.SecretData) error { return nil }
+		mockStore := &MockFileStore{
+			ReadFunc:  nil,
+			WriteFunc: nil,
+		}
+
+		input := ``
+		payload := strings.NewReader(input)
+
+		req := httptest.NewRequest(http.MethodPost, "/", payload)
+		rr := httptest.NewRecorder()
+
+		secretHandler(mockStore)(rr, req)
+
+		resp := rr.Result()
+
+		want := http.StatusBadRequest
 		got := resp.StatusCode
 
 		if got != want {
@@ -149,3 +202,5 @@ func TestHealthcheck(t *testing.T) {
 		}
 	})
 }
+
+// TODO: up to `Handler functionality is working as expected` testing section
