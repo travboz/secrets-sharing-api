@@ -69,20 +69,28 @@ type CreateSecretResponse struct {
 
 func createSecretHandler(s store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Decode request body
 		var payload CreateSecretRequest
 		if err := readJSON(w, r, &payload); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		// Generate hash of secret and store it in file store
+		// Check for length of secret
+		if len(payload.Secret) == 0 {
+			http.Error(w, "secret cannot be empty", http.StatusBadRequest)
+			return
+		}
+
+		// Generate hash of secret and insert it into the store
 		id := HashSecret(payload.Secret)
 		if err := s.Write(store.SecretData{Id: id, Secret: payload.Secret}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		if err := writeJSON(w, http.StatusOK, CreateSecretResponse{ID: id}, nil); err != nil {
+		// Successful response sends the key ID of the newly created secret
+		if err := writeJSON(w, http.StatusCreated, CreateSecretResponse{ID: id}, nil); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}

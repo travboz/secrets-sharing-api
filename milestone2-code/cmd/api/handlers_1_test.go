@@ -82,7 +82,7 @@ func TestEndpointRouting(t *testing.T) {
 
 		resp := rr.Result()
 
-		want := http.StatusOK
+		want := http.StatusCreated
 		got := resp.StatusCode
 
 		if got != want {
@@ -141,7 +141,10 @@ func TestHealthCheck(t *testing.T) {
 		healthCheckHandler(rr, req)
 
 		resp := rr.Result()
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal("Error reading body in healthcheck:", err)
+		}
 
 		want := "ok"
 		got := string(body)
