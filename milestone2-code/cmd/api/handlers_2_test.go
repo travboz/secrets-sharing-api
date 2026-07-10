@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"testing"
 
@@ -229,6 +230,116 @@ func TestHandlerFunctionality(t *testing.T) {
 
 			// Check status code
 			assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
+		})
+
+	})
+}
+
+/*
+Process:
+1. Handler gets called once with valid id, returns secret.
+2. Handlers gets called again with same id from (1), returns store.ErrKeyNotFound because we're
+	expecting the store to delete an item after its viewed once.
+
+So, need to:
+- mock the store again
+- use a spy to track how many calls were made to the store using that id
+- if id has already been called, return store.ErrKeyNotFound
+*/
+
+type SpyFileStore struct {
+	ReadFunc  func(key string) (string, error)
+	WriteFunc func(data store.SecretData) error
+	KeysSeen  []string
+}
+
+func (m *SpyFileStore) Read(key string) (string, error) {
+	// New key/id, haven't seen this before
+	if !slices.Contains(m.KeysSeen, key) {
+		m.AppendKey(key)       // Add key to seen
+		return m.ReadFunc(key) // Return secret as expected
+	}
+
+	// We've already seen this key/id, i.e. the GET request has already been made for this key.
+	// Secrets should be seen once, and so we return an error.
+	return "", store.ErrKeyNotFound
+}
+
+func (m *SpyFileStore) Write(data store.SecretData) error {
+	return m.WriteFunc(data)
+}
+
+func (m *SpyFileStore) AppendKey(id string) {
+	m.KeysSeen = append(m.KeysSeen, id)
+}
+
+func TestGetHandler(t *testing.T) {
+	t.Run("Secrets can be seen one time only", func(t *testing.T) {
+		inputId := "7a819afa983d454b3a368c1422ba853c"
+		expectedSecret := "My super secret1234151"
+
+		// Setup: Create a Spy mock store
+		readFn := func(key string) (string, error) {
+			if key == inputId {
+				return expectedSecret, nil
+			}
+			return "some-default-secret", nil
+		}
+
+		writeFn := func(data store.SecretData) error { return nil }
+
+		mockStore := &SpyFileStore{
+			ReadFunc:  readFn,
+			WriteFunc: writeFn,
+			KeysSeen:  make([]string, 0),
+		}
+
+		// Setup: Create test server
+		mux := http.NewServeMux()
+		setupRoutes(mux, mockStore)
+
+		ts := httptest.NewServer(mux)
+		defer ts.Close()
+
+		t.Run("Retrieve ID on first GET request to endpoint", func(t *testing.T) {
+			// Start actual testing work
+			resp, err := ts.Client().Get(ts.URL + fmt.Sprintf("/%s", inputId))
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer resp.Body.Close()
+
+			// Check status code
+			assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatal("Error reading body", err)
+			}
+
+			// Check response body matches expected secret string
+			p := GetSecretResponse{}
+			err = json.Unmarshal(body, &p)
+			if err != nil {
+				t.Fatal("Error unmarshalling body into GetSecretResponse", err)
+			}
+
+			got := p.Secret
+			want := expectedSecret
+
+			assert.Equal(t, got, want)
+		})
+
+		t.Run("Second GET request to endpoint with same id fails", func(t *testing.T) {
+			// Start actual testing work
+			resp, err := ts.Client().Get(ts.URL + fmt.Sprintf("/%s", inputId))
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer resp.Body.Close()
+
+			// Check status code
+			assert.Equal(t, resp.StatusCode, http.StatusNotFound)
 		})
 
 	})
