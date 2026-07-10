@@ -103,7 +103,7 @@ curl -X GET "$URL"/"$ID"
 
 ## Performance
 
-> todo
+> ***NOTE:*** There is **a lot of repetition** in the `cmd/api/handlers_X_test.go` files. This is intended as the focus was to complete `milestone 2`. Refactoring will occur later - when application is completed.
 <!-- | Metric | This Project | Alternative A | Alternative B |
 |--------|--------------|---------------|---------------|
 | Requests/sec | 47,000 | 23,000 | 31,000 |
@@ -116,7 +116,7 @@ curl -X GET "$URL"/"$ID"
 ## Roadmap
 
 - [x] Milestone 1
-- [ ] Milestone 2
+- [x] Milestone 2
 - [ ] Milestone 3
 
 See the [project](https://www.manning.com/liveproject/build-a-secrets-sharing-web-application) for more information.
