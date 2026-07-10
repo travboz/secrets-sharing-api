@@ -28,13 +28,8 @@ func secretHandler(s store.Store) http.HandlerFunc {
 	}
 }
 
-type GetSecretResponse struct {
-	Secret string `json:"secret"`
-}
-
 func getSecretHandler(s store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		id := r.URL.Path
 		id = strings.TrimPrefix(id, "/")
 		if len(id) == 0 {
@@ -53,18 +48,10 @@ func getSecretHandler(s store.Store) http.HandlerFunc {
 			return
 		}
 
-		if err := writeJSON(w, http.StatusOK, GetSecretResponse{Secret: secret}, nil); err != nil {
+		if err := writeJSON(w, http.StatusOK, GetSecretResponse{Data: secret}, nil); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
-}
-
-type CreateSecretRequest struct {
-	Secret string `json:"secret"`
-}
-
-type CreateSecretResponse struct {
-	ID string `json:"id"`
 }
 
 func createSecretHandler(s store.Store) http.HandlerFunc {
@@ -77,14 +64,14 @@ func createSecretHandler(s store.Store) http.HandlerFunc {
 		}
 
 		// Check for length of secret
-		if len(payload.Secret) == 0 {
+		if len(payload.Plaintext) == 0 {
 			http.Error(w, "secret cannot be empty", http.StatusBadRequest)
 			return
 		}
 
 		// Generate hash of secret and insert it into the store
-		id := HashSecret(payload.Secret)
-		if err := s.Write(store.SecretData{Id: id, Secret: payload.Secret}); err != nil {
+		id := HashSecret(payload.Plaintext)
+		if err := s.Write(store.SecretData{Id: id, Secret: payload.Plaintext}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
