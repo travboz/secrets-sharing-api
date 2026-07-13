@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+vars:
+  GREETING: Hello, world!
+
+tasks:
+  default:
+    desc: Print a greeting message
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  run:
+    desc: Start the Secrets Sharing API server
+    cmds:
+      - go run ./cmd/api
+
+  build:
+    desc: Build the server into a binary
+    cmds:
+      - go build -o bin/secret-share ./cmd/api
+      
+  run-binary:
+    desc: Run the server using the compiled binary
+    cmds:
+      - ./bin/secret-share
