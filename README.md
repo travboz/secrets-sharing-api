@@ -1,9 +1,9 @@
 # Secrets Sharing Web API
 
-<!-- ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Coverage](https://img.shields.io/badge/coverage-70%25-salmon)
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 ![go version](https://img.shields.io/badge/go-v1.26.4-blue)
+<!-- ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-70%25-salmon)
 ![Downloads](https://img.shields.io/badge/downloads-0k%2Fmonth-purple) -->
 
 > **One-liner:** Easily **create** and **share** secrets with colleagues using this small API.
@@ -11,7 +11,7 @@
 <figure>
     <img src="knight-gopher.png"
          alt="Hardened Knight Gopher"
-         width="200px">
+         width="350px">
     <figcaption>Our Knight Gopher standing ready to defend against any attempts at brute force attacks!.</figcaption>
 </figure>
 
@@ -33,10 +33,10 @@ See the [project](https://www.manning.com/liveproject/build-a-secrets-sharing-we
 
 ```bash
 # Clone repo to local machine
-git clone https://github.com/travboz/secret-sharing.git
+git clone https://github.com/travboz/secrets-sharing-api.git
 
 # cd into repository root directory
-cd secret-sharing
+cd secrets-sharing-api
 
 # Download dependencies
 go mod download
@@ -69,26 +69,48 @@ To jump into a particular milestone just pick one, navigate to its directory, an
 For example:
 
 ```bash
-git clone https://github.com/travboz/secret-sharing.git # Clone repo
-cd secret-sharing/milestone3-code # Navigate to the final milestone's directory
+# Clone repo
+git clone https://github.com/travboz/secrets-sharing-api.git
+
+# Navigate to the final milestone's directory
+cd secrets-sharing-api/milestone3-code
 ```
 
 ### Option 1: Build from source
 
 ```bash
-git clone https://github.com/travboz/secret-sharing.git # Clone repo
-cd secret-sharing/milestone3-code # cd into repository root directory
-go mod download # Download and install dependencies
-go build -o bin/secret-store ./cmd/api # Build the application
+# Clone repo
+git clone https://github.com/travboz/secrets-sharing-api.git
+
+ # Navigate to repository root directory
+cd secrets-sharing-api/milestone3-code
+
+# Download and install dependencies
+go mod download
+
+# Change .env.example to .env
+mv .env.example .env
+
+# Build the application
+go build -o bin/secret-store ./cmd/api
 ```
 
 ### Option 2: Build using `Task`
 
 ```bash
-git clone https://github.com/travboz/secret-sharing.git # Clone repo
-cd secret-sharing/milestone3-code # Navigate to repository root directory
-go mod download # Download and install dependencies
-task -l # To view available tasks
+# Clone the repo
+git clone https://github.com/travboz/secrets-sharing-api.git
+
+# Navigate to repository root directory
+cd secrets-sharing-api/milestone3-code
+
+# Download and install dependencies
+go mod download
+
+# To view available tasks
+task -l
+
+# Build the binary and run it
 task build && task run-binary
 ```
 
@@ -151,18 +173,23 @@ The other milestone directories follow a similar structure.
 
 You'll find a `.env` file included in the repo which contains some default values for these values (as they are **all** ***required***) as these are all used within the store for the application.
 
+Ensure you either **create** your own `.env` file, or rename the sample env file: `mv .env.example .env`, before running the application otherwise you'll encounter an error.
+
 ### Basic Example
 
 ```bash
-curl -X POST -d '{"secret": "super-secret-word"}' http://localhost:8080/
+curl -X POST -d '{"plain_text":"super-secret-word"}' http://localhost:8080/
 
-curl -X GET http://localhost:8080/some-hash
+ID=vnerbnvebnernvewcinij34323wq
+curl -X GET http://localhost:8080/$ID
 ```
 
 ### Environment Variables
 
 ```bash
 DATA_FILE_PATH=/path/to/json/file.json
+PASSWORD=thecolourblue
+SALT=pinkseasalt
 ```
 
 ## API Reference
@@ -178,7 +205,7 @@ DATA_FILE_PATH=/path/to/json/file.json
 **1.** The following send a create secret request and receive a response containing a `SHA256` hash of the secret.
 
 ```bash
-PAYLOAD='{"secret": "super-secret"}'
+PAYLOAD='{"plain_text":"super-secret"}'
 URL='http://localhost:8080'
 
 curl -d "$PAYLOAD" "$URL"/
@@ -240,3 +267,4 @@ MIT © [Travis](https://github.com/travboz)
 ## Acknowledgments
 
 - [Manning](https://www.manning.com/) - Producer of liveProject
+- [Gopher](https://github.com/egonelbre/gophers) illustration by Egon Elbre (egonelbre/gophers), [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
