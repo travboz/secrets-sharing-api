@@ -1,37 +1,57 @@
 # Secrets Sharing Web API
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+<!-- ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-70%25-salmon)
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 ![go version](https://img.shields.io/badge/go-v1.26.4-blue)
-![Downloads](https://img.shields.io/badge/downloads-0k%2Fmonth-purple)
+![Downloads](https://img.shields.io/badge/downloads-0k%2Fmonth-purple) -->
 
-**One-line description:** Create and share secrets easily using this API.
+> **One-liner:** Easily **create** and **share** secrets with colleagues using this small API.
 
-[Screenshot or GIF demo here](have to find one)
+<figure>
+    <img src="knight-gopher.png"
+         alt="Hardened Knight Gopher"
+         width="200px">
+    <figcaption>Our Knight Gopher standing ready to defend against any attempts at brute force attacks!.</figcaption>
+</figure>
 
-## Why This Project?
+## Roadmap & Why This Project?
 
-- ✅ **Milestne 1:** liveProject goal is to build a secrets sharing application for a company that frequently shares sensitive data.
+I purchased this project course because I was under the impression *we'd* build something cool - turns out **I** was the one doing the building. This project helped build confidence in testing and problem solving (specifically, working through the steps required to solve a problem).
+
+See the [project](https://www.manning.com/liveproject/build-a-secrets-sharing-web-application) brief on Manning for more information.
+
+- [x] **Milestone 1, Create the Secret Sharing API:** Create a web application which will allow you to create and view secrets.
+- [x] **Milestone 2, Testing the API:** Use the Go standard libraries to write tests to verify the functionality of the secret sharing web application.
+- [x] **Milestone 3, Encrypt the data at rest:** Implement the encryption of the secrets at rest. Use a symmetric cryptographic algorithm (Advanced Encryption Standard - AES) to encrypt the secret when storing it and then decrypt it back when reading from the file.
+
+### Note: My learning experience
+
+> I feel like the structure of this project may have been overengineered. The saving grace here is that I believe I can easily extend it - for example by swapping out the file-based storage with S3 or MongoDB. It is also easier tested as the interfaces allow for simple mocking. I have also attempted to implement some methods learned in Learn Go with Tests (for example, spying on calls).
 
 ## Quick Start
 
 ```bash
 # Clone repo to local machine
-git clone https://github.com/username/repo.git
+git clone https://github.com/travboz/secret-sharing.git
 
 # cd into repository root directory
-cd repo
+cd secret-sharing
 
 # Download dependencies
 go mod download
 
+# Change .env.example to .env
+mv .env.example .env
+
 # Run
 go run ./cmd/api
 
+# Navigate to the URL, for e.g.
+curl http://localhost:8080/healthcheck
 ```
 
-That's it! You're ready to use [Project Name].
+That's it! You're ready to use it.
 
 ## Installation
 
@@ -40,30 +60,104 @@ That's it! You're ready to use [Project Name].
 - Golang `1.26.4+`
 - git
 
+### Picking a milestone
+
+This project consisted of the `3` milestone - which were created in sequence.
+
+To jump into a particular milestone just pick one, navigate to its directory, and explore.
+
+For example:
+
+```bash
+git clone https://github.com/travboz/secret-sharing.git # Clone repo
+cd secret-sharing/milestone3-code # Navigate to the final milestone's directory
+```
+
 ### Option 1: Build from source
 
 ```bash
-git clone https://github.com/username/repo.git # Clone repo
-cd repo # cd into repository root directory
+git clone https://github.com/travboz/secret-sharing.git # Clone repo
+cd secret-sharing/milestone3-code # cd into repository root directory
 go mod download # Download and install dependencies
 go build -o bin/secret-store ./cmd/api # Build the application
 ```
 
+### Option 2: Build using `Task`
+
+```bash
+git clone https://github.com/travboz/secret-sharing.git # Clone repo
+cd secret-sharing/milestone3-code # Navigate to repository root directory
+go mod download # Download and install dependencies
+task -l # To view available tasks
+task build && task run-binary
+```
+
 ## Usage
+
+### Directory structure
+
+To illustrate, here is the tree from the `milestone3-code` directory + those in the `root` of the repository.
+
+The other milestone directories follow a similar structure.
+
+```bash
+.
+├── README.md # Info and description on the repo.
+├── knight-gopher.png # Our courageous defender!
+└── milestone3-code # All milestone 3 related code.
+    ├── Taskfile.yml # Contains the tasks runnable for this project.
+    ├── api-test.http # Used for repeatable manual endpoint testing (see VSCode extension 'REST Client' by Huachao Mao).
+    ├── bin # Omitted from repo but this is where the 'build' task places the API's binary.
+    │   └── secret-share
+    ├── cmd
+    │   └── api
+    │       ├── create_secret_handler_test.go # Tests related to the POST endpoint used in creating new secrets.
+    │       ├── get_secret_handler_test.go # Tests related to the GET endpoint for fetching created secrets.
+    │       ├── handlers.go # Contains the health check, get and post handlers for managing secrets.
+    │       ├── healthcheck_handler_test.go # Tests pertaining to the GET health check endpoint.
+    │       ├── helpers.go # Utils used through the API. e.g. writing json to the response, reading in json from a request, hashing secrets, etc.
+    │       ├── main.go # Entrypoint of the API
+    │       ├── routes.go # Attach routes to the mux.
+    │       ├── routes_test.go # Tests related to testing that our router accepts or rejects the correct URLs (e.g. we do not want PUT requests to our create secrets endpoint).
+    │       ├── testutils.go # Contains mocks used for testing. Currently not using Table-Driven tests as goal is to refactor once project (parts 1 and 2) are complete.
+    │       └── types.go # Request and response types used in handlers.
+    ├── data.json # File created to store secrets in file system - defined by the 'DATA_FILE_NAME` environment variable.
+    ├── go.mod
+    ├── go.sum
+    ├── internal
+    │   ├── encryption # Files used for encrypting the secrets at rest.
+    │   │   ├── cryptoconfig # Concrete implementation using AES-GCM of Encrypter interface.
+    │   │   │   ├── cryptoconfig.go
+    │   │   │   └── types.go
+    │   │   └── interface.go # Encrypter interface in the event I wanted to use a different algorithm (or mock during testing). 
+    │   └── store # Data access for the secrets data storage.
+    │       ├── filestore # File-based store.
+    │       │   └── filestore.go
+    │       ├── interface.go # Store interface used to support easier testing and future storage implementations. 
+    │       └── types.go # Storage-associated types (particularly SecretData - used as the base type for the secret storage data).
+    └── pkg
+        └── testing
+            └── assert # Assertion library discovered through following Alex Edwards' work on Let's Go and Let's Go Further - useful and simple assertion package.
+                └── assert.go
+```
+
+### `.env` file configuration
+
+| Option | Type | Default | Description |
+| -------- | ------ | --------- | ------------- |
+| `DATA_FILE_PATH` | string | None | Path for file-based storage |
+| `PASSWORD` | string | None | A unique password you choose to encrypt and decrypt the secrets. |
+| `SALT` | string | None | The salt is some random data used in conjunction with the password for encryption and decryption. |
+
+You'll find a `.env` file included in the repo which contains some default values for these values (as they are **all** ***required***) as these are all used within the store for the application.
 
 ### Basic Example
 
 ```bash
-curl -d '{"secret": "super-secret-word"}' http://localhost:8080/
+curl -X POST -d '{"secret": "super-secret-word"}' http://localhost:8080/
 
 curl -X GET http://localhost:8080/some-hash
 ```
-
-## Configuration
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `DATA_FILE_PATH` | string | None | Path for file-based storage |
 
 ### Environment Variables
 
@@ -103,7 +197,7 @@ curl -X GET "$URL"/"$ID"
 
 ## Performance
 
-> ***NOTE:*** There is **a lot of repetition** in the `cmd/api/handlers_X_test.go` files. This is intended as the focus was to complete `milestone 2`. Refactoring will occur later - when application is completed.
+> ***NOTE:*** There is **a lot of repetition** in the `cmd/api/XXX_test.go` files. This is intended as the focus was to complete the project. Refactoring will occur later - when application is completed.
 <!-- | Metric | This Project | Alternative A | Alternative B |
 |--------|--------------|---------------|---------------|
 | Requests/sec | 47,000 | 23,000 | 31,000 |
@@ -112,14 +206,6 @@ curl -X GET "$URL"/"$ID"
 | Cold start | 150ms | 890ms | 420ms | -->
 
 <!-- *Benchmarks run on AWS c5.xlarge, Node.js 20, Ubuntu 22.04* -->
-
-## Roadmap
-
-- [x] Milestone 1
-- [x] Milestone 2
-- [ ] Milestone 3
-
-See the [project](https://www.manning.com/liveproject/build-a-secrets-sharing-web-application) for more information.
 
 ## Troubleshooting
 
@@ -153,4 +239,4 @@ MIT © [Travis](https://github.com/travboz)
 
 ## Acknowledgments
 
-- [Manning](https://www.manning.com/) - Producer of live project
+- [Manning](https://www.manning.com/) - Producer of liveProject
