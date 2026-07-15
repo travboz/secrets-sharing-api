@@ -19,15 +19,15 @@
 
 I purchased this project course because I was under the impression *we'd* build something cool - turns out **I** was the one doing the building. This project helped build confidence in testing and problem solving (specifically, working through the steps required to solve a problem).
 
-See the [project](https://www.manning.com/liveproject/build-a-secrets-sharing-web-application) brief on Manning for more information.
+See the [project](https://www.manning.com/liveproject) briefs on Manning for more information.
 
-- [x] **Milestone 1, Create the Secret Sharing API:** Create a web application which will allow you to create and view secrets.
-- [x] **Milestone 2, Testing the API:** Use the Go standard libraries to write tests to verify the functionality of the secret sharing web application.
-- [x] **Milestone 3, Encrypt the data at rest:** Implement the encryption of the secrets at rest. Use a symmetric cryptographic algorithm (Advanced Encryption Standard - AES) to encrypt the secret when storing it and then decrypt it back when reading from the file.
+- [x] **Part 1, Create the Secret Sharing API:** Create a web application which will allow you to create and view secrets.
+- [ ] **Part 2, Create a Custom HTTP Client:** Implement a client for the web application to enable users to create and view secrets from the command line.
 
 ### Note: My learning experience
 
-> I feel like the structure of this project may have been overengineered. The saving grace here is that I believe I can easily extend it - for example by swapping out the file-based storage with S3 or MongoDB. It is also easier tested as the interfaces allow for simple mocking. I have also attempted to implement some methods learned in Learn Go with Tests (for example, spying on calls).
+> **Part 1:** I feel like the structure of this project may have been overengineered. The saving grace here is that I believe I can easily extend it - for example by swapping out the file-based storage with S3 or MongoDB. It is also easier tested as the interfaces allow for simple mocking. I have also attempted to implement some methods learned in Learn Go with Tests (for example, spying on calls).
+> **Part 2:** Flags... what to do with flags. CLIs seem to be a common usecase for Go. There are so many packages to choose from which help streamline and expedite the creation of a CLI using the language. I jumped around a lot and was going to use urfave/cli because it seemed very intuitive, I was going to use Cobra because there was so much coverage of the tool, and everyone seems to be using it. However, as the brief wanted me to, I stuck with the `flag` package from the standard library. It was difficult, and I ended up implementing subcommands instead of picking words out of the soup of arguments like the brief said to. This is mainly because I love the `kubectl` and `git` style subcommands.
 
 ## Quick Start
 
