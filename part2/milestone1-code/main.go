@@ -15,6 +15,9 @@ With this CLI we can create and view secrets using the application's API.
 
 Usage: %s command [options]
 `
+
+	ActionView   = "view"
+	ActionCreate = "create"
 )
 
 func printUsage(w io.Writer) {
@@ -38,11 +41,13 @@ func main() {
 	// We have more than 2 args, so determine which operation is which:
 	subcommand := os.Args[1]
 	args := os.Args[2:]
+
 	var err error
 	var result ParseResult
 
 	switch subcommand {
-	case "create":
+
+	case ActionCreate:
 		result, err = parseCreateArgs(os.Stderr, args)
 		if err != nil {
 			if errors.Is(err, ErrInvalidPosArgSpecified) {
@@ -52,15 +57,20 @@ func main() {
 			os.Exit(1)
 		}
 
-		result.Config.Action = "create"
+		result.Config.Action = ActionCreate
 
-		err = validateCreateArgs(result.Config)
-		if err != nil {
+		if err = validateCreateArgs(result.Config); err != nil {
 			fmt.Fprintln(os.Stdout, err)
 			result.Usage()
 			os.Exit(1)
 		}
-	case "view":
+
+		if err = runCreateSecret(os.Stdout, result.Config); err != nil {
+			fmt.Fprintln(os.Stdout, err)
+			os.Exit(1)
+		}
+
+	case ActionView:
 		result, err = parseViewArgs(os.Stderr, args)
 		if err != nil {
 			if errors.Is(err, ErrInvalidPosArgSpecified) {
@@ -70,27 +80,17 @@ func main() {
 			os.Exit(1)
 		}
 
-		result.Config.Action = "view"
+		result.Config.Action = ActionView
 
-		err = validateViewArgs(result.Config)
-		if err != nil {
+		if err = validateViewArgs(result.Config); err != nil {
 			fmt.Fprintln(os.Stdout, err)
 			result.Usage()
 			os.Exit(1)
 		}
+
+		if err = runViewSecret(os.Stdout, result.Config); err != nil {
+			fmt.Fprintln(os.Stdout, err)
+			os.Exit(1)
+		}
 	}
-
-	err = runCreateSecret(os.Stdout, result.Config)
-	if err != nil {
-		fmt.Fprintln(os.Stdout, err)
-		os.Exit(1)
-	}
-
-	// flag.Parse()
-
-	// remainder := flag.Args()
-	// if flag.NArg() != 0 {
-	// 	fmt.Fprintln(os.Stdout, "No positional args allowed")
-	// }
-	// fmt.Fprintln(os.Stdout, "Remaining args: ", remainder)
 }

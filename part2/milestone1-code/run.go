@@ -17,5 +17,12 @@ func runCreateSecret(w io.Writer, c ClientConfig) error {
 }
 
 func runViewSecret(w io.Writer, c ClientConfig) error {
+	result, err := getSecret(c.URL, c.Id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintln(w, result)
+
 	return nil
 }
