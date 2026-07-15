@@ -22,7 +22,9 @@ func runViewSecret(w io.Writer, c ClientConfig) error {
 		return err
 	}
 
-	fmt.Fprintln(w, result)
+	if result.Data != "" {
+		fmt.Fprintln(w, result)
+	}
 
 	return nil
 }

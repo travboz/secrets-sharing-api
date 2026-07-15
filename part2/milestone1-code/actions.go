@@ -12,7 +12,7 @@ type CreateSecretResponse struct {
 }
 
 func (r CreateSecretResponse) String() string {
-	return fmt.Sprintf("{\"id\": %q}", r.Id)
+	return fmt.Sprintf("%s", r.Id)
 }
 
 func createSecret(apiURL string, plainText string) (CreateSecretResponse, error) {
@@ -55,7 +55,7 @@ type GetSecretResponse struct {
 }
 
 func (r GetSecretResponse) String() string {
-	return fmt.Sprintf("{\"data\": %q}", r.Data)
+	return fmt.Sprintf("%s", r.Data)
 }
 
 func getSecret(apiURL string, secretID string) (GetSecretResponse, error) {
