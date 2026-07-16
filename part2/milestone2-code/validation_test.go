@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-type testConfig struct {
+type vTestConfig struct {
 	name string
 	c    ClientConfig
 	err  error
@@ -12,7 +12,7 @@ func TestValidateUrlAndAction(t *testing.T) {
 	testUrl := "http://www.example.com"
 	testAction := "action"
 
-	tests := []testConfig{
+	tests := []vTestConfig{
 		{
 			name: "Empty client config",
 			c:    ClientConfig{},
@@ -54,7 +54,7 @@ func TestValidateCreateArgs(t *testing.T) {
 	testUrl := "http://www.example.com"
 	testAction := "action"
 
-	tests := []testConfig{
+	tests := []vTestConfig{
 		{
 			// Uncertain about this test - it actually tests whether
 			// 'validateUrlAndAction' is working.
@@ -98,7 +98,7 @@ func TestValidateViewArgs(t *testing.T) {
 	testUrl := "http://www.example.com"
 	testAction := "view"
 
-	tests := []testConfig{
+	tests := []vTestConfig{
 		{
 			// Uncertain about this test - it actually tests whether
 			// 'validateUrlAndAction' is working.
@@ -141,7 +141,7 @@ func TestValidateViewArgs(t *testing.T) {
 func TestValidateConfig(t *testing.T) {
 	testUrl := "http://www.example.com"
 
-	tests := []testConfig{
+	tests := []vTestConfig{
 		{
 			// Uncertain about this test - it actually tests whether
 			// 'validateUrlAndAction' is working.

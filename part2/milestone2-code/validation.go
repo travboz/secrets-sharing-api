@@ -18,10 +18,10 @@ func validateConfig(cfg ClientConfig) error {
 }
 
 func validateUrlAndAction(c ClientConfig) error {
-	if c.Action == "" {
+	if strings.TrimSpace(c.Action) == "" {
 		return ErrActionNotSpecified
 	}
-	if c.URL == "" {
+	if strings.TrimSpace(c.URL) == "" {
 		return ErrUrlNotSpecified
 	}
 
