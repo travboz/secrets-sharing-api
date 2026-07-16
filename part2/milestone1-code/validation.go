@@ -1,6 +1,9 @@
 package main
 
-import "net/url"
+import (
+	"net/url"
+	"strings"
+)
 
 // validateConfig validates the values in the config given which action subcommand is picked.
 func validateConfig(cfg ClientConfig) error {
@@ -27,14 +30,6 @@ func validateUrlAndAction(c ClientConfig) error {
 	}
 
 	return nil
-
-	// Redundant because action is checked in validateConfig
-	// switch c.Action {
-	// case ActionView, ActionCreate:
-	// 	return nil
-	// default:
-	// 	return ErrInvalidAction
-	// }
 }
 
 func validateCreateArgs(c ClientConfig) error {
@@ -47,7 +42,8 @@ func validateCreateArgs(c ClientConfig) error {
 	// 	return ErrInvalidAction
 	// }
 
-	if c.Data == "" || c.Data == " " {
+	// Trimming because " " used to show defaults of options
+	if strings.TrimSpace(c.Data) == "" {
 		return ErrCreateDataOptionEmpty
 	}
 	if c.Id != "" {
@@ -61,11 +57,6 @@ func validateViewArgs(c ClientConfig) error {
 	if err := validateUrlAndAction(c); err != nil {
 		return err
 	}
-
-	// Redundant because if action isn't 'view', this code is never actually reached
-	// if c.Action != ActionView {
-	// 	return ErrInvalidAction
-	// }
 
 	if c.Id == "" || c.Id == " " {
 		return ErrViewIdEmpty

@@ -9,6 +9,9 @@ type testConfig struct {
 }
 
 func TestValidateUrlAndAction(t *testing.T) {
+	testUrl := "http://www.example.com"
+	testAction := "action"
+
 	tests := []testConfig{
 		{
 			name: "Empty client config",
@@ -17,12 +20,17 @@ func TestValidateUrlAndAction(t *testing.T) {
 		},
 		{
 			name: "Action only",
-			c:    ClientConfig{Action: "test"},
+			c:    ClientConfig{Action: testAction},
 			err:  ErrUrlNotSpecified,
 		},
 		{
-			name: "Action and URL provided is valid",
-			c:    ClientConfig{Action: "action", URL: "url"},
+			name: "Invalid url endpoint",
+			c:    ClientConfig{Action: testAction, URL: "blahblah"},
+			err:  ErrInvalidURL,
+		},
+		{
+			name: "(happy path) Action and URL provided is valid",
+			c:    ClientConfig{Action: testAction, URL: testUrl},
 			err:  nil,
 		},
 	}
@@ -43,21 +51,31 @@ func TestValidateUrlAndAction(t *testing.T) {
 }
 
 func TestValidateCreateArgs(t *testing.T) {
+	testUrl := "http://www.example.com"
+	testAction := "action"
+
 	tests := []testConfig{
 		{
+			// Uncertain about this test - it actually tests whether
+			// 'validateUrlAndAction' is working.
 			name: "Empty client config",
 			c:    ClientConfig{},
-			err:  ErrCreateDataOptionEmpty,
+			err:  ErrActionNotSpecified,
 		},
 		{
 			name: "Empty data option fails",
-			c:    ClientConfig{Action: "action", URL: "url", Data: ""},
+			c:    ClientConfig{Action: testAction, URL: testUrl, Data: ""},
 			err:  ErrCreateDataOptionEmpty,
 		},
 		{
 			name: "Id must be empty",
-			c:    ClientConfig{Action: "action", URL: "url", Data: "data", Id: "id"},
+			c:    ClientConfig{Action: testAction, URL: testUrl, Data: "data", Id: "id"},
 			err:  ErrCreateIdNotEmpty,
+		},
+		{
+			name: "(happy path) Create with non-empty data and empty id is successful",
+			c:    ClientConfig{Action: testAction, URL: testUrl, Data: "data"},
+			err:  nil,
 		},
 	}
 
@@ -77,21 +95,31 @@ func TestValidateCreateArgs(t *testing.T) {
 }
 
 func TestValidateViewArgs(t *testing.T) {
+	testUrl := "http://www.example.com"
+	testAction := "view"
+
 	tests := []testConfig{
 		{
+			// Uncertain about this test - it actually tests whether
+			// 'validateUrlAndAction' is working.
 			name: "Empty client config",
 			c:    ClientConfig{},
-			err:  ErrViewIdEmpty,
+			err:  ErrActionNotSpecified,
 		},
 		{
 			name: "Empty id option fails",
-			c:    ClientConfig{Action: "action", URL: "url", Id: ""},
+			c:    ClientConfig{Action: testAction, URL: testUrl, Id: ""},
 			err:  ErrViewIdEmpty,
 		},
 		{
 			name: "Data must be empty",
-			c:    ClientConfig{Action: "action", URL: "url", Data: "data", Id: "id"},
+			c:    ClientConfig{Action: testAction, URL: testUrl, Data: "data", Id: "id"},
 			err:  ErrViewDataNotEmpty,
+		},
+		{
+			name: "(happy path) View with id and empty data succeeds",
+			c:    ClientConfig{Action: testAction, URL: testUrl, Id: "id"},
+			err:  nil,
 		},
 	}
 
