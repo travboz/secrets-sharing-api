@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// ClientConfig holds the data used to determine what action to perform, and its relevant data.
 type ClientConfig struct {
 	Action string // view or create
 	Data   string // plaintext secret to store
@@ -9,6 +10,7 @@ type ClientConfig struct {
 	URL    string // url of secret sharing api
 }
 
+// Pretty printing
 func (c ClientConfig) String() string {
 	return fmt.Sprintf(
 		"Action: %s\nData: %s\nId: %s\nURL: %s",

@@ -109,3 +109,44 @@ func TestValidateViewArgs(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateConfig(t *testing.T) {
+	dummyUrl := "http://www.example.com"
+
+	tests := []testConfig{
+		{
+			name: "Empty client config fails",
+			c:    ClientConfig{},
+			err:  ErrInvalidAction,
+		},
+		{
+			name: "Invalid action fails",
+			c:    ClientConfig{Action: "action"},
+			err:  ErrInvalidAction,
+		},
+		{
+			name: "Create action and valid options succeed",
+			c:    ClientConfig{Action: "create", URL: dummyUrl, Data: "data", Id: ""},
+			err:  nil,
+		},
+		{
+			name: "View action and valid options succeed",
+			c:    ClientConfig{Action: "view", URL: dummyUrl, Data: "", Id: "id"},
+			err:  nil,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := validateConfig(tc.c)
+
+			if tc.err != nil && err != tc.err {
+				t.Errorf("want error to be: %q, got %q\n", tc.err, err)
+			}
+
+			if tc.err == nil && err != nil {
+				t.Errorf("want nil error, but got: %q\n", err)
+			}
+		})
+	}
+}

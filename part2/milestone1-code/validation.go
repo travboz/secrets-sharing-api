@@ -1,15 +1,18 @@
 package main
 
-import "errors"
+import "net/url"
 
-var (
-	ErrActionNotSpecified    = errors.New("Action must be specified")
-	ErrUrlNotSpecified       = errors.New("Must specify the URL for the secret sharing api")
-	ErrCreateDataOptionEmpty = errors.New("'create' command requires that --data option not be empty")
-	ErrCreateIdNotEmpty      = errors.New("'create' command requires empty --id option")
-	ErrViewIdEmpty           = errors.New("'view' command requires that --id option not be empty")
-	ErrViewDataNotEmpty      = errors.New("'view' command requires empty --data option")
-)
+// validateConfig validates the values in the config given which action subcommand is picked.
+func validateConfig(cfg ClientConfig) error {
+	switch cfg.Action {
+	case ActionCreate:
+		return validateCreateArgs(cfg)
+	case ActionView:
+		return validateViewArgs(cfg)
+	default:
+		return ErrInvalidAction
+	}
+}
 
 func validateUrlAndAction(c ClientConfig) error {
 	if c.Action == "" {
@@ -19,10 +22,31 @@ func validateUrlAndAction(c ClientConfig) error {
 		return ErrUrlNotSpecified
 	}
 
+	if _, err := url.ParseRequestURI(c.URL); err != nil {
+		return ErrInvalidURL
+	}
+
 	return nil
+
+	// Redundant because action is checked in validateConfig
+	// switch c.Action {
+	// case ActionView, ActionCreate:
+	// 	return nil
+	// default:
+	// 	return ErrInvalidAction
+	// }
 }
 
 func validateCreateArgs(c ClientConfig) error {
+	if err := validateUrlAndAction(c); err != nil {
+		return err
+	}
+
+	// Redundant because if action isn't 'create', this code is never actually reached
+	// if c.Action != ActionCreate {
+	// 	return ErrInvalidAction
+	// }
+
 	if c.Data == "" || c.Data == " " {
 		return ErrCreateDataOptionEmpty
 	}
@@ -30,17 +54,25 @@ func validateCreateArgs(c ClientConfig) error {
 		return ErrCreateIdNotEmpty
 	}
 
-	return validateUrlAndAction(c)
+	return nil
 }
 
 func validateViewArgs(c ClientConfig) error {
+	if err := validateUrlAndAction(c); err != nil {
+		return err
+	}
+
+	// Redundant because if action isn't 'view', this code is never actually reached
+	// if c.Action != ActionView {
+	// 	return ErrInvalidAction
+	// }
+
 	if c.Id == "" || c.Id == " " {
 		return ErrViewIdEmpty
 	}
-
 	if c.Data != "" {
 		return ErrViewDataNotEmpty
 	}
 
-	return validateUrlAndAction(c)
+	return nil
 }
