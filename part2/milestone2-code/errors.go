@@ -16,4 +16,5 @@ var (
 	ErrViewDataNotEmpty = errors.New("'view' command requires empty --data option")
 
 	ErrInvalidPosArgSpecified = errors.New("no positional arguments are allowed")
+	ErrEmptyArgs              = errors.New("args cannot be empty")
 )

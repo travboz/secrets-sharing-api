@@ -14,6 +14,10 @@ type ParseResult struct {
 // parseArgs parses the arguments given to the CLI.
 // How it parses the arguments depends on the subcommand action chosen.
 func parseArgs(w io.Writer, args []string) (ParseResult, error) {
+	if len(args) == 0 {
+		return ParseResult{}, ErrEmptyArgs
+	}
+
 	subcommand := args[0]
 	options := args[1:]
 

@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"reflect"
 	"testing"
@@ -181,26 +180,71 @@ func TestParseCreateAndViewArgs(t *testing.T) {
 }
 
 func TestParseArgs(t *testing.T) {
+	testUrl := "http://www.example.com"
+	testData := "secret"
+	testId := "id"
+
 	tests := []paTestConfig{
 		{
-			name: "empty args",
+			name:      "empty args",
+			err:       ErrEmptyArgs,
+			args:      []string{},
+			parseFunc: parseArgs,
 		},
 		{
-			name: "create with correct args returns config",
+			name:      "create with correct args returns config",
+			err:       nil,
+			args:      []string{"create", "--url", testUrl, "--data", testData},
+			parseFunc: parseArgs,
+			c:         ClientConfig{Action: ActionCreate, URL: testUrl, Data: testData},
 		},
 		{
-			name: "view with correct args returns config",
+			name:      "view with correct args returns config",
+			err:       nil,
+			args:      []string{"view", "--url", testUrl, "--id", testId},
+			parseFunc: parseArgs,
+			c:         ClientConfig{Action: ActionView, URL: testUrl, Id: testId},
 		},
 		{
-			name: "unknown action gives no config and gives invalid action error",
+			name:      "unknown action gives no config and gives invalid action error",
+			err:       ErrInvalidAction,
+			args:      []string{"unknown"},
+			parseFunc: parseArgs,
 		},
-		{
-			name: "wrong options for view means fail",
-		},
-		{
-			name: "wrong options for create means fail",
-		},
+		// {
+		// Unsure about this test because it technically tests
+		// validateViewArgs.
+		// name: "wrong options for view means fail",
+		// },
+		// {
+		// Unsure about this test because it technically tests
+		// validateCreateArgs.
+		// name: "wrong options for create means fail",
+		// },
 	}
 
-	fmt.Println(tests)
+	outputBuf := new(bytes.Buffer)
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := tc.parseFunc(outputBuf, tc.args)
+			if tc.err == nil && err != nil {
+				t.Fatalf("want nil error, got: %v\n", err)
+			}
+			if tc.err != nil && err.Error() != tc.err.Error() {
+				t.Fatalf("want error to be: %v, got: %v\n", tc.err, err)
+			}
+
+			if !reflect.DeepEqual(result.Config, tc.c) {
+				t.Errorf("want config to be: %v, but got: %v", tc.c, result.Config)
+			}
+
+			gotMsg := outputBuf.String()
+			if len(tc.output) != 0 && gotMsg != tc.output {
+				t.Errorf("want stdout message to be: %#v, got: %#v\n", tc.output, gotMsg)
+			}
+
+			outputBuf.Reset()
+		})
+	}
 }
