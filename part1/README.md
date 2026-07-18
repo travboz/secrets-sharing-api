@@ -1,4 +1,4 @@
-# Secrets Sharing Web API
+# Part 1: Build a Secrets Sharing Web Application
 
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 ![go version](https://img.shields.io/badge/go-v1.26.4-blue)

@@ -1,4 +1,4 @@
-# Secrets Sharing Web API, Part 2 - Create a Custom HTTP Client
+# Part 2: Create a Custom HTTP Client
 
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 ![go version](https://img.shields.io/badge/go-v1.26.4-blue)
