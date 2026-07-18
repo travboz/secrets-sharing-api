@@ -11,6 +11,8 @@ type CreateSecretResponse struct {
 	Id string `json:"id"`
 }
 
+// createSecret makes a request to the Secret Sharing API server's POST endpoint and
+// returns the stored secret's ID if successful.
 func createSecret(apiURL string, plainText string) (CreateSecretResponse, error) {
 	payload := fmt.Sprintf(`{"plain_text":"%s"}`, plainText)
 
@@ -36,6 +38,8 @@ type GetSecretResponse struct {
 	Data string `json:"data"`
 }
 
+// getSecret makes a request to the Secret Sharing API server's GET /id endpoint and
+// returns the plaintext secret if successful.
 func getSecret(apiURL string, secretID string) (GetSecretResponse, error) {
 	completeUrl := fmt.Sprintf("%s/%s", apiURL, secretID)
 	resp, err := http.Get(completeUrl)
