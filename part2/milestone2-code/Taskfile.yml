@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+  build:
+    desc: Build the CLI binary
+    cmds:
+      - printf "Building..."
+      - go build -o bin/cli
+      - sleep 0.5
+      - printf "done.\n"
+    silent: true
