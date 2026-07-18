@@ -31,4 +31,4 @@ go.work.sum
 .vscode/
 
 # Binaries in each milestone
-milestone*-code/bin/
+part*/milestone*-code/bin/
