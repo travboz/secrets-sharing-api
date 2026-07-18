@@ -22,7 +22,7 @@ I purchased this project course because I was under the impression *we'd* build 
 See the [project](https://www.manning.com/liveproject) briefs on Manning for more information.
 
 - [x] **Part 1, Create the Secret Sharing API:** Create a web application which will allow you to create and view secrets.
-- [ ] **Part 2, Create a Custom HTTP Client:** Implement a client for the web application to enable users to create and view secrets from the command line.
+- [x] **Part 2, Create a Custom HTTP Client:** Implement a client for the web application to enable users to create and view secrets from the command line.
 
 ### Note: My learning experience
 

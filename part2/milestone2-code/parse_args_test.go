@@ -53,7 +53,7 @@ func TestParseCreateAndViewArgs(t *testing.T) {
 	tests := []paTestConfig{
 		// parseCreateArgs TESTS
 		{
-			name:      "No flags mean no parse errors",
+			name:      "create: No flags mean no parse errors",
 			parseFunc: parseCreateArgs,
 			args:      []string{},
 			c:         ClientConfig{Action: ActionCreate, URL: defaultUrlValue, Data: defaultDataValue},
@@ -61,41 +61,39 @@ func TestParseCreateAndViewArgs(t *testing.T) {
 			err:       nil,
 		},
 		{
-			name:      "No positional args allowed",
+			name:      "create: No positional args allowed",
 			parseFunc: parseCreateArgs,
 			args:      []string{"hello"},
 			c:         ClientConfig{},
 			err:       ErrInvalidPosArgSpecified,
 		},
 		{
-			name:      "Unknown flag",
+			name:      "create: Unknown flag",
 			parseFunc: parseCreateArgs,
 			args:      []string{"--hello"},
 			c:         ClientConfig{},
 			output: `flag provided but not defined: -hello
-
 ` + createUsageString,
 			err: errors.New("flag provided but not defined: -hello"),
 		},
 		{
-			name:      "Correct required flags with extra undefined flag means fail",
+			name:      "create: Correct required flags with extra undefined flag means fail",
 			parseFunc: parseCreateArgs,
 			args:      []string{"--url", testUrl, "--data", testData, "--extra", "hello"},
 			c:         ClientConfig{},
 			output: `flag provided but not defined: -extra
-
 ` + createUsageString,
 			err: errors.New("flag provided but not defined: -extra"),
 		},
 		{
-			name:      "Correct required flags with positional arg",
+			name:      "create: Correct required flags with positional arg",
 			parseFunc: parseCreateArgs,
 			args:      []string{"--url", testUrl, "--data", testId, "hello"},
 			c:         ClientConfig{},
 			err:       ErrInvalidPosArgSpecified,
 		},
 		{
-			name:      "(happy path) Correct use means success",
+			name:      "create (happy path): Correct use means success",
 			parseFunc: parseCreateArgs,
 			args:      []string{"--url", testUrl, "--data", testData},
 			c:         ClientConfig{Action: ActionCreate, URL: testUrl, Data: testData},
@@ -103,7 +101,7 @@ func TestParseCreateAndViewArgs(t *testing.T) {
 		},
 		// parseViewArgs TESTS
 		{
-			name:      "No flags mean no parse errors",
+			name:      "view: No flags mean no parse errors",
 			parseFunc: parseViewArgs,
 			args:      []string{},
 			c:         ClientConfig{Action: ActionView, URL: defaultUrlValue, Id: defaultIdValue},
@@ -111,41 +109,39 @@ func TestParseCreateAndViewArgs(t *testing.T) {
 			err:       nil,
 		},
 		{
-			name:      "No positional args allowed",
+			name:      "view: No positional args allowed",
 			parseFunc: parseViewArgs,
 			args:      []string{"hello"},
 			c:         ClientConfig{},
 			err:       ErrInvalidPosArgSpecified,
 		},
 		{
-			name:      "Unknown flag",
+			name:      "view: Unknown flag",
 			parseFunc: parseViewArgs,
 			args:      []string{"--goodbye"},
 			c:         ClientConfig{},
 			output: `flag provided but not defined: -goodbye
-
 ` + viewUsageString,
 			err: errors.New("flag provided but not defined: -goodbye"),
 		},
 		{
-			name:      "Correct required flags with extra undefined flag means fail",
+			name:      "view: Correct required flags with extra undefined flag means fail",
 			parseFunc: parseViewArgs,
 			args:      []string{"--url", testUrl, "--id", testId, "--extra"},
 			c:         ClientConfig{},
 			output: `flag provided but not defined: -extra
-
 ` + viewUsageString,
 			err: errors.New("flag provided but not defined: -extra"),
 		},
 		{
-			name:      "Correct required flags with positional arg",
+			name:      "view: Correct required flags with positional arg",
 			parseFunc: parseViewArgs,
 			args:      []string{"--url", testUrl, "--id", testId, "goodbye"},
 			c:         ClientConfig{},
 			err:       ErrInvalidPosArgSpecified,
 		},
 		{
-			name:      "(happy path) Correct use means success",
+			name:      "view (happy path): Correct use means success",
 			parseFunc: parseViewArgs,
 			args:      []string{"--url", testUrl, "--id", testId},
 			c:         ClientConfig{Action: ActionView, URL: testUrl, Id: testId},

@@ -3,12 +3,9 @@ package main
 import (
 	"fmt"
 	"io"
-	"slices"
 )
 
 const (
-	programName = "secret-share"
-
 	createDescription = "Create a new secret using the create secret endpoint."
 	viewDescription   = "Fetch a secret using the get secret endpoint."
 
@@ -24,10 +21,13 @@ Create and view secrets through the application's HTTP API.
 
 Usage:
   %s <command> [options]
+
+Available subcommands:
+  create    Create a new secret using the create secret endpoint.
+  view      Fetch a secret using the get secret endpoint.
 `
 
-	subcommandUsage = `
-%s
+	subcommandUsage = `%s
 
 Usage: %s [options]
 
@@ -39,11 +39,17 @@ func printUsage(w io.Writer) {
 	fmt.Fprintf(w, usageString, programName)
 }
 
-// helpCalled is a quick check for whether the help flag is present in the args slice.
-func helpCalled(args []string) bool {
-	if slices.Contains(args, "--help") || slices.Contains(args, "-h") {
-		return true
+// isGlobalHelp checks for whether the help flag was requested before any subcommand
+// was given. e.g. 'cli -h' or 'cli --help' with nothing else.
+func isGlobalHelp(args []string) bool {
+	if len(args) != 2 {
+		return false
 	}
 
-	return false
+	switch args[1] {
+	case "-h", "--help":
+		return true
+	default:
+		return false
+	}
 }

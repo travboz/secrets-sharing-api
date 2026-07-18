@@ -1,4 +1,4 @@
-# Milestone 1
+# CLI planning
 
 CLI for the HTTP client for the secret sharing web application will be:
 
@@ -29,7 +29,7 @@ secret-share view --url=localhost:8080/ --id=secret-colour-hashed-id
 
 Group by resource. All actions on a resource live together.
 
-```
+```bash
 git remote add
 git remote remove
 git remote list
@@ -51,7 +51,7 @@ aws s3 rm
 
 Group by action. One verb applies across many resource types.
 
-```
+```bash
 kubectl get pods
 kubectl get services
 kubectl delete pods
@@ -68,9 +68,10 @@ systemctl status nginx
 
 ### Flags = Adjectives
 
-Modify the noun/verb without changing the sentence shape. Keep meaning consistent across all subcommands.
+- Modify the noun/verb without changing the sentence shape.
+- Keep meaning consistent across all subcommands.
 
-```
+```bash
 kubectl get pods --namespace=prod --output=json
 git branch list --merged --sort=-committerdate
 ```

@@ -9,28 +9,11 @@
 > **One-liner:** *Even more* easily **create** and **share** secrets with colleagues using this small CLI client.
 
 <figure>
-    <img src="knight-gopher.png"
+    <img src="../knight-gopher.png"
          alt="Hardened Knight Gopher"
          width="350px">
     <figcaption>Our Knight Gopher standing ready to defend against any attempts at brute force attacks!.</figcaption>
 </figure>
-
-## Roadmap & Why This Project?
-
-I purchased this project course because I was under the impression *we'd* build something cool - turns out **I** was the one doing the building. This project helped build confidence in **testing** and **problem solving** (specifically, working through the steps required to solve a problem).
-
-What part taught the project really taught me:
-<blockquote><p>Tests don't have to be scary.</p><p>CLI tools don't have to be scary.</p></blockquote>
-
-See the [project](https://www.manning.com/liveproject/build-a-secrets-sharing-web-application) brief on Manning for more information.
-
-- [x] **Milestone 1, Create the Custom HTTP Client:** write a command-line HTTP client for the secret sharing web application. This client will implement a user-friendly interface for creating and viewing secrets via the command line.
-- [x] **Milestone 2, Testing the HTTP Client:** write tests for the client application created in Milestone 1.
-
-### Note: My learning experience
-
-> I spent a little bit too much time planning the layout of this CLI. I deviated from the original brief by implementing two subcommands (`view` and `create`) instead of shotgunning all the flags into one long string of arguments. This mimics (at least on a small scale) those CLIs we always used - like `git`. See the thought process and planning in its section below.
-> I then spent too much time focusing on the `secret.go` tests and was uncertain if they were required. I had completed the `parse_args.go` and `validation.go` tests already and wasn't sure why `secret.go` was taking so long - so I downloaded the solution and checked if they were included. These ended up not being included and I figured the rationale was because we controlled the API and were assuming, to a heavy degree, that everything would follow the 'happy path' generally. So, I've kept that work there for reference because it helped solidify Go's `http.Handler` interface.
 
 ## Quick Start
 
@@ -56,6 +39,23 @@ make build
 ```
 
 That's it! You're ready to use it.
+
+## Roadmap & Why This Project?
+
+I purchased this project course because I was under the impression *we'd* build something cool - turns out **I** was the one doing the building. This project helped build confidence in **testing** and **problem solving** (specifically, working through the steps required to solve a problem).
+
+What part taught the project really taught me:
+<blockquote><p>Tests don't have to be scary.</p><p>CLI tools don't have to be scary.</p></blockquote>
+
+See the [project](https://www.manning.com/liveproject/build-a-secrets-sharing-web-application) brief on Manning for more information.
+
+- [x] **Milestone 1, Create the Custom HTTP Client:** write a command-line HTTP client for the secret sharing web application. This client will implement a user-friendly interface for creating and viewing secrets via the command line.
+- [x] **Milestone 2, Testing the HTTP Client:** write tests for the client application created in Milestone 1.
+
+## Note: My learning experience
+
+> I spent a little bit too much time planning the layout of this CLI. I deviated from the original brief by implementing two subcommands (`view` and `create`) instead of shotgunning all the flags into one long string of arguments. This mimics (at least on a small scale) those CLIs we always used - like `git`. See the thought process and planning in its section below.
+> I then spent too much time focusing on the `secret.go` tests and was uncertain if they were required. I had completed the `parse_args.go` and `validation.go` tests already and wasn't sure why `secret.go` was taking so long - so I downloaded the solution and checked if they were included. These ended up not being included and I figured the rationale was because we controlled the API and were assuming, to a heavy degree, that everything would follow the 'happy path' generally. So, I've kept that work there for reference because it helped solidify Go's `http.Handler` interface.
 
 ## Installation
 
@@ -177,6 +177,84 @@ URL='http://localhost:8080'
 
 curl -X GET "$URL"/"$ID"
 # output: {"secret": "super-secret"}
+```
+
+## Learning: CLI planning
+
+CLI for the HTTP client for the secret sharing web application will be:
+
+```bash
+secret-share <verb> [flags]
+```
+
+We only have 2 possible commands (actions):
+
+1. `view` --url=url-of-server --id=id
+2. `create` --url=url-of-server --data=some-secret-text
+
+So, some examples:
+
+```bash
+# Create a new secret
+secret-share create --url=localhost:8080/ --data="super-secret-colour"
+# output: id=<some-id>
+
+# View a created secret
+secret-share view --url=localhost:8080/ --id=secret-colour-hashed-id
+# output: data=<super-secret-colour>
+```
+
+### Structure of CLI: CLI Command Structure Reference
+
+#### Noun-First (`tool <noun> <verb> [flags]`)
+
+Group by resource. All actions on a resource live together.
+
+```bash
+git remote add
+git remote remove
+git remote list
+
+docker container run
+docker container start
+docker compose up
+
+aws s3 cp
+aws s3 ls
+aws s3 rm
+```
+
+**Good for:** tools with a fixed set of resources and many operations per resource.
+
+---
+
+#### Verb-First (`tool <verb> <noun> [flags]`)
+
+Group by action. One verb applies across many resource types.
+
+```bash
+kubectl get pods
+kubectl get services
+kubectl delete pods
+kubectl describe nodes
+
+systemctl start nginx
+systemctl stop nginx
+systemctl status nginx
+```
+
+**Good for:** tools with a small, stable set of actions applied broadly.
+
+---
+
+#### Flags = Adjectives
+
+- Modify the noun/verb without changing the sentence shape.
+- Keep meaning consistent across all subcommands.
+
+```bash
+kubectl get pods --namespace=prod --output=json
+git branch list --merged --sort=-committerdate
 ```
 
 ## Troubleshooting

@@ -1,9 +1,13 @@
 package main
 
 import (
+	"errors"
+	"flag"
 	"fmt"
 	"os"
 )
+
+const programName = "secret-share"
 
 func main() {
 	// Check if length of args is valid, we expect: cli subcommand
@@ -12,15 +16,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Help check
-	if helpCalled(os.Args) {
+	// Check for if help has been called with no subcommand.
+	if isGlobalHelp(os.Args) {
 		printUsage(os.Stdout)
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	// We have at least 2 args, so determine if a subcommand has been called.
 	result, err := parseArgs(os.Stdout, os.Args[1:])
 	if err != nil {
+		// Check if subcommand help has been called - so no need to call as fs.Usage() was called.
+		if errors.Is(err, flag.ErrHelp) {
+			os.Exit(0)
+		}
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
